@@ -1,0 +1,3 @@
+numpy==1.17.4
+face_recognition==1.3.0
+Pillow==8.1.2

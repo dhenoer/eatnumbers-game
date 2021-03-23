@@ -10,13 +10,15 @@ import face_recognition
 import threading
 import random
 
+# eat numbers scattered around you
+# win if sum of of selected numbers equal to target specified
 
-MAXTARGETVALUE = 20
-MAXMAINELEMENT = 10
-MAXSALTELEMENT = 5
+MAXTARGETVALUE = 20 # maximum value of target
+MAXMAINELEMENT = 10 # maximum number of main elements to scattered
+MAXSALTELEMENT = 5  # maximum number of salt elements to scattered 
 
-MAXTOLERANCELIPSTONUMBER = 200
-MINSMILEDEGREE = 165
+MAXTOLERANCELIPSTONUMBER = 200  # maximum distance of lips to number selected
+MINSMILEDEGREE = 170 
 MINMOUTHOPENRATIO = 0.25
 
 class Game:
@@ -87,7 +89,7 @@ class Game:
 
         cv2.putText(frame, 
             'You {}'.format('win' if self.level=='win' else 'loss') +
-            ' by collecting {}'.format(sum(self.choices)), 
+            ' by collecting {} of {}'.format(sum(self.choices), self.target), 
             (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,0), 2)
         return frame
 
@@ -219,10 +221,10 @@ class Face:
         vOB = np.array(self.center_lip) - np.array(self.top_lip[-1])
         vOAB = vOA.dot(vOB)
         lenvOAB = abs(np.linalg.norm(vOA))*abs(np.linalg.norm(vOB))
-        angledegree = math.acos(vOAB/lenvOAB) / math.pi * 180
+        angle = math.degrees( math.acos( vOAB/lenvOAB ))
 
-        print('degree=', angledegree)  
-        if angledegree < MINSMILEDEGREE :
+        #print('degree=', angle)  
+        if angle < MINSMILEDEGREE :
             return True
         else:
             return False
