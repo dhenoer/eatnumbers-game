@@ -18,8 +18,8 @@ MAXMAINELEMENT = 10 # maximum number of main elements to scattered
 MAXSALTELEMENT = 5  # maximum number of salt elements to scattered 
 
 MAXTOLERANCELIPSTONUMBER = 200  # maximum distance of lips to number selected
-MINSMILEDEGREE = 170 
-MINMOUTHOPENRATIO = 0.25
+MINSMILEDEGREE = 170 # minimum/maximum degree of angle of smile 
+MINMOUTHOPENRATIO = 0.25 # minimum ratio of vertical/horizontal distance of lips
 
 class Game:
     '''Game class to prepare game initial and control the role
@@ -30,14 +30,15 @@ class Game:
     choices:list -- selected number has been eaten
     level:string -- game phase
     stamp_win:image array -- lips-red.png for winning stamp
-    stamp_loss:image array -- foot-stamp.png for lossing stamp
+    stamp_lose:image array -- foot-stamp.png for lose stamp
     '''
 
     def __init__(self):
         ''' init stamp '''
         self.stamp_win = PIL.Image.open('img/lips-red.resized.png')
-        self.stamp_loss = PIL.Image.open('img/foot-stamp-resized.png')
+        self.stamp_lose = PIL.Image.open('img/foot-stamp-resized.png')
         self.level = ''
+
 
     def start(self):
         ''' start game '''
@@ -75,29 +76,29 @@ class Game:
             self.positions.append((x, y))
 
 
-    def play_head_winloss(self, frame):
-        '''show heading of win/loss'''
+    def play_head_winlose(self, frame):
+        '''show heading of win/lose'''
 
-        if self.level not in ['win', 'loss']:
+        if self.level not in ['win', 'lose']:
             return frame
 
-        winlosscolor = (0,0,255) if self.level=='win' else (255,0,0)
+        winlosecolor = (0,0,255) if self.level=='win' else (255,0,0)
         if random.randint(0,2):
-            cv2.rectangle(frame, (0,0), (len(frame[0]), 40), winlosscolor, -1)
+            cv2.rectangle(frame, (0,0), (len(frame[0]), 40), winlosecolor, -1)
         else:
             cv2.rectangle(frame, (0,0), (len(frame[0]), 40), (0,0,0), -1)
 
         cv2.putText(frame, 
-            'You {}'.format('win' if self.level=='win' else 'loss') +
+            'You {}'.format('win' if self.level=='win' else 'lose') +
             ' by collecting {} of {}'.format(sum(self.choices), self.target), 
             (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,0), 2)
         return frame
 
 
-    def play_winloss(self, image, center_lip):
-        '''play win or loss'''
+    def play_winlose(self, image, center_lip):
+        '''play win or lose'''
 
-        if self.level not in ['win', 'loss']:
+        if self.level not in ['win', 'lose']:
             return image
 
         #stamp.thumbnail((300,300), PIL.Image.ANTIALIAS)
@@ -107,7 +108,7 @@ class Game:
             if self.level == 'win':
                 stamp = self.stamp_win
             else:
-                stamp = self.stamp_loss
+                stamp = self.stamp_lose
 
             topleftpos = (center_lip[0] - stamp.width//2, 
                 center_lip[1] - stamp.height//2)
@@ -122,7 +123,7 @@ class Game:
             return None
 
         cv2.rectangle(frame, (0,0), (len(frame[0]), 40), (0,0,0), -1)
-        cv2.putText(frame, 'Smile please, to start game', 
+        cv2.putText(frame, 'Smile please, to start the game', 
             (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,0), 2)
 
         if is_smile:
@@ -156,8 +157,8 @@ class Game:
             #print('Menang... Selamat')
 
         elif sumc > self.target:
-            # next level is loss
-            self.level = 'loss'
+            # next level is lose
+            self.level = 'lose'
             #print('Kalah..')
 
 
@@ -169,7 +170,7 @@ class Game:
 
         # display instructions and target
         cv2.rectangle(frame, (0,0), (len(frame[0]), 40), (0,0,0), -1)
-        cv2.putText(frame, 'Eat numbers by your mouth, target sum = {}'.format(self.target), 
+        cv2.putText(frame, 'Eat numbers by your mouth, target is {}'.format(self.target), 
             (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,0), 2)
 
         # display choices / numbers has been eaten
@@ -198,7 +199,7 @@ class Face:
     '''Face class
 
     loc:list -- boundingbox face 
-    mark:list -- features / landmarks of face coordinate
+    mark:list -- face features / landmarks coordinate
     top_lip:list -- top lips coordinate
     bottom_lip:list -- bottom lips coordinate
     center_lip:tuple -- center of mouth coordinate
@@ -307,17 +308,6 @@ class VideoCapture:
         # Command Line Parser
         args=CommandLineParser().args
      
-        #create videowriter
-
-        # 1. Video Type
-        VIDEO_TYPE = {
-            'avi': cv2.VideoWriter_fourcc(*'XVID'),
-            #'mp4': cv2.VideoWriter_fourcc(*'H264'),
-            'mp4': cv2.VideoWriter_fourcc(*'XVID'),
-        }
-
-        self.fourcc=VIDEO_TYPE[args.type[0]]
-
         # 2. Video Dimension
         STD_DIMENSIONS =  {
             '480p': (640, 480),
@@ -326,8 +316,6 @@ class VideoCapture:
             '4k': (3840, 2160),
         }
         res=STD_DIMENSIONS[args.res[0]]
-        #print(args.name,self.fourcc,res)
-        self.out = cv2.VideoWriter(args.name[0]+'.'+args.type[0],self.fourcc,10,res)
 
         #set video sourec width and height
         self.vid.set(3,res[0])
@@ -354,7 +342,6 @@ class VideoCapture:
     def __del__(self):
         if self.vid.isOpened():
             self.vid.release()
-            self.out.release()
             cv2.destroyAllWindows()
 
 
@@ -369,14 +356,8 @@ class CommandLineParser:
         # for now no required arguments 
         # required_arguments=parser.add_argument_group('Required command line arguments')
 
-        # Only values is supporting for the tag --type. So nargs will be '1' to get
-        parser.add_argument('--type', nargs=1, default=['avi'], type=str, help='Type of the video output: for now we have only AVI & MP4')
-
         # Only one values are going to accept for the tag --res. So nargs will be '1'
         parser.add_argument('--res', nargs=1, default=['480p'], type=str, help='Resolution of the video output: for now we have 480p, 720p, 1080p & 4k')
-
-        # Only one values are going to accept for the tag --name. So nargs will be '1'
-        parser.add_argument('--name', nargs=1, default=['output'], type=str, help='Enter Output video title/name')
 
         # Parse the arguments and get all the values in the form of namespace.
         # Here args is of namespace and values will be accessed through tag names
@@ -456,10 +437,10 @@ class App:
             self.game.play_smile(frame, self.face.is_mouth_smile())
             frame = self.game.scatter(frame)
             self.game.play_eat(self.face.center_lip, self.face.is_mouth_open())
-            frame = self.game.play_head_winloss(frame)
+            frame = self.game.play_head_winlose(frame)
                 
             image = PIL.Image.fromarray(frame)
-            image = self.game.play_winloss(image, self.face.center_lip)
+            image = self.game.play_winlose(image, self.face.center_lip)
 
             self.photo = PIL.ImageTk.PhotoImage(image = image)
             self.canvas.create_image(0, 0, image = self.photo, anchor = tk.NW)
