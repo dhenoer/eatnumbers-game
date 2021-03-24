@@ -19,19 +19,18 @@ Game dibuat dengan bahasa pemrograman Python3 berbasis GUI dengan TkInter dan me
 Bagi saya, program ini media pembelajaran untuk memahami OpenCV dan melatih kemampuan algoritma pemrograman.
 
 Berikut adalah modul-modul yang diimport oleh program:
-
-<code>
-import tkinter as tk
-import cv2
-import numpy as np
-import math
-import PIL.Image, PIL.ImageTk
-import time
-import datetime as dt
-import argparse
-import face_recognition
-import threading
-import random
-</code>
+    
+    import tkinter as tk
+    import cv2
+    import numpy as np
+    import math
+    import PIL.Image, PIL.ImageTk
+    import time
+    import datetime as dt
+    import argparse
+    import face_recognition
+    import threading
+    import random
+    
 
 Silakan pull untuk dipelajari dan dikembangkan
