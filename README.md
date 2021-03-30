@@ -1,7 +1,7 @@
 # EatNumbers - Game
 
 
-![EatNumbers ScreenShoot](https://github.com/dhenoer/main/blob/img/eatnumbers-game.png)
+![EatNumbers ScreenShoot](img/eatnumbers-game.png)
 
 Game ini merupakan permainan yang sangat sederhana. Pemain ditugaskan untuk memakan angka-angka yang bertebaran di layar dengan cara membuka mulut. Makanlah beberapa angka agar jumlah sesuai dengan target.    
 
