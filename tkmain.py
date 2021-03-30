@@ -222,13 +222,13 @@ class Face:
         vOB = np.array(self.center_lip) - np.array(self.top_lip[-1])
         vOAB = vOA.dot(vOB)
         lenvOAB = abs(np.linalg.norm(vOA))*abs(np.linalg.norm(vOB))
-        angle = math.degrees( math.acos( vOAB/lenvOAB ))
+        if lenvOAB:
+            angle = math.degrees( math.acos( vOAB/lenvOAB ))
 
-        #print('degree=', angle)  
-        if angle < MINSMILEDEGREE :
-            return True
-        else:
-            return False
+            #print('degree=', angle)  
+            if angle < MINSMILEDEGREE :
+                return True
+        return False
 
 
     def is_mouth_open(self):
