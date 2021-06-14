@@ -17,7 +17,8 @@ dan memasang target.
 
 ## Video
 
-![Video di Youtube](https://www.youtube.com/watch?v=wYZDW0o26jA)
+[![Video di Yutube](https://img.youtube.com/vi/wYZDW0o26jA/0.jpg)](https://www.youtube.com/watch?v=wYZDW0o26jA)
+
 
 ## Algoritma
 
